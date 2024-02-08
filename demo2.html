@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="authors" content="Parth Trivedi, Hussain Harianawala, Vaishnavi Pawar, Sumit Gandoo">
+  <title>Linear Search Visualization</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-XXXXX" crossorigin="anonymous">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      text-align: center;
+    }
+    .list-item {
+      display: inline-block;
+      margin: 5px;
+      padding: 10px;
+      border: 1px solid black;
+      background-color: lightblue;
+      position: relative;
+    }
+    .arrow {
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      animation: moveArrow 0.5s linear;
+    }
+    .cross, .tick {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 24px;
+    }
+    .cross {
+      color: red;
+    }
+    .tick {
+      color: green;
+    }
+    @keyframes moveArrow {
+      0% { left: -20px; }
+      100% { left: calc(100% + 20px); }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Linear Search Visualization</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <input type="range" min="100" max="1000" step="100" value="500" id="speedRange">
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2>Linear Search Visualization</h2>
+    <div id="list-container"></div>
+    <label for="searchNumber">Enter a number to search:</label>
+    <input type="number" id="searchNumber">
+    <button onclick="startSearch()">Search</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const list = [8, 4, 12, 6, 10, 2];
+    const listContainer = document.getElementById('list-container');
+    const searchNumberInput = document.getElementById('searchNumber');
+    const resultDisplay = document.getElementById('result');
+    const speedRange = document.getElementById('speedRange');
+
+    // Display the list visually
+    list.forEach(item => {
+      const listItem = document.createElement('div');
+      listItem.textContent = item;
+      listItem.classList.add('list-item');
+      listContainer.appendChild(listItem);
+    });
+
+    // Linear search algorithm
+    function linearSearch(numberToSearch) {
+      for (let i = 0; i < list.length; i++) {
+        if (list[i] === numberToSearch) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    // Start the search
+    function startSearch() {
+      const searchNumber = parseInt(searchNumberInput.value);
+      animateSearch(searchNumber);
+    }
+
+    // Animate the search process
+    function animateSearch(searchNumber) {
+      const animationSpeed = parseInt(speedRange.value);
+      let found = false;
+      let index = 0;
+
+      const arrow = document.createElement('div');
+      arrow.textContent = '↑';
+      arrow.classList.add('arrow');
+      listContainer.appendChild(arrow);
+
+      const interval = setInterval(() => {
+        if (index < list.length) {
+          if (list[index] === searchNumber) {
+            found = true;
+            clearInterval(interval);
+          }
+          arrow.style.left = `${listContainer.children[index].offsetLeft - 20}px`;
+          // Add micro-interaction
+          listContainer.children[index].style.backgroundColor = 'yellow';
+          setTimeout(() => {
+            listContainer.children[index].style.backgroundColor = 'lightblue';
+          }, animationSpeed / 2);
+          index++;
+        } else {
+          clearInterval(interval);
+        }
+      }, animationSpeed);
+
+      setTimeout(() => {
+        arrow.remove();
+        if (found) {
+          const tick = document.createElement('div');
+          tick.textContent = '✔';
+          tick.classList.add('tick');
+          resultDisplay.innerHTML = 'Match found';
+          listContainer.appendChild(tick);
+          setTimeout(() => {
+            tick.remove();
+            resultDisplay.innerHTML = '';
+          }, 2000);
+        } else {
+          const cross = document.createElement('div');
+          cross.textContent = '✘';
+          cross.classList.add('cross');
+          resultDisplay.innerHTML = 'No match found';
+          listContainer.appendChild(cross);
+          setTimeout(() => {
+            cross.remove();
+            resultDisplay.innerHTML = '';
+          }, 2000);
+        }
+      }, (list.length * animationSpeed) + animationSpeed);
+    }
+  </script>
+</body>
+</html>
