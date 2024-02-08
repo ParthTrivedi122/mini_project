@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linear Search Visualization</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      text-align: center;
+    }
+    .list-item {
+      display: inline-block;
+      margin: 5px;
+      padding: 10px;
+      border: 1px solid black;
+      background-color: lightblue;
+      position: relative;
+    }
+    .arrow {
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      animation: moveArrow 0.5s linear;
+    }
+    .cross, .tick {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 24px;
+    }
+    .cross {
+      color: red;
+    }
+    .tick {
+      color: green;
+    }
+    @keyframes moveArrow {
+      0% { left: -20px; }
+      100% { left: calc(100% + 20px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Linear Search Visualization</h2>
+    <div id="list-container"></div>
+    <label for="searchNumber">Enter a number to search:</label>
+    <input type="number" id="searchNumber">
+    <button onclick="startSearch()">Search</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const list = [8, 4, 12, 6, 10, 2];
+    const listContainer = document.getElementById('list-container');
+    const searchNumberInput = document.getElementById('searchNumber');
+    const resultDisplay = document.getElementById('result');
+
+    // Display the list visually
+    list.forEach(item => {
+      const listItem = document.createElement('div');
+      listItem.textContent = item;
+      listItem.classList.add('list-item');
+      listContainer.appendChild(listItem);
+    });
+
+    // Linear search algorithm
+    function linearSearch(numberToSearch) {
+      for (let i = 0; i < list.length; i++) {
+        if (list[i] === numberToSearch) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    // Start the search
+    function startSearch() {
+      const searchNumber = parseInt(searchNumberInput.value);
+      animateSearch(searchNumber);
+    }
+
+    // Animate the search process
+    function animateSearch(searchNumber) {
+      let found = false;
+      let index = 0;
+
+      const arrow = document.createElement('div');
+      arrow.textContent = '↑';
+      arrow.classList.add('arrow');
+      listContainer.appendChild(arrow);
+
+      const interval = setInterval(() => {
+        if (index < list.length) {
+          if (list[index] === searchNumber) {
+            found = true;
+            clearInterval(interval);
+          }
+          arrow.style.left = `${listContainer.children[index].offsetLeft - 20}px`;
+          index++;
+        } else {
+          clearInterval(interval);
+        }
+      }, 500);
+
+      setTimeout(() => {
+        arrow.remove();
+        if (found) {
+          const tick = document.createElement('div');
+          tick.textContent = '✔';
+          tick.classList.add('tick');
+          resultDisplay.innerHTML = 'Match found';
+          listContainer.appendChild(tick);
+          setTimeout(() => {
+            tick.remove();
+            resultDisplay.innerHTML = '';
+          }, 2000);
+        } else {
+          const cross = document.createElement('div');
+          cross.textContent = '✘';
+          cross.classList.add('cross');
+          resultDisplay.innerHTML = 'No match found';
+          listContainer.appendChild(cross);
+          setTimeout(() => {
+            cross.remove();
+            resultDisplay.innerHTML = '';
+          }, 2000);
+        }
+      }, (list.length * 500) + 500);
+    }
+  </script>
+</body>
+</html>
