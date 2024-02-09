@@ -204,6 +204,7 @@ input {
   display: flex;
   flex-direction: column;
   background-color: #2E2E33;
+  border-radius: 10px;
   
   /* background: rgb(206,208,171);
   background: linear-gradient(90deg, rgba(206,208,171,1) 15%, 
