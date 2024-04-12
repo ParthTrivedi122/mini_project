@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate MAC</title>
+  
+  <style>
+    body {
+      background: linear-gradient(to right, #0072ff, #00c6ff);
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      animation: gradientAnimation 10s ease infinite;
+    }
+
+    @keyframes gradientAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .container {
+      width: 80%;
+      background-color: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 1s;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+      animation: slideIn 1s;
+    }
+
+    .messageBox {
+      margin-left: 20px;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+      overflow: hidden;
+      word-wrap: break-word;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .bigMessageBox {
+      margin-left: 20px;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type="text"],
+    input[type="button"] {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type="button"] {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    input[type="button"]:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-50%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        width: 90%;
+      }
+
+      .row {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="messageLabel">
+                <label>Enter the Message</label>
+            </div>
+            <div class="messageField">
+                <input type="text" id="message"/>
+            </div>
+            <div class="keyLabel">
+                <label>Enter the Key</label>
+            </div>
+            <div class="keyField">
+                <input type="text" id="key"/>
+            </div>
+            <div class="submit">
+                <input type="button" value="Start Stimulation" onclick="mac1()"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+            <div class="messageBox" id="messageId1">
+                
+                <div class="message">
+                    Message is:<br> <label id="messageContent" style="font-weight: bold;"></label><br>
+                   
+                </div>
+                
+            </div>
+            <!-- <div style="margin-left: 50px;width: 150px; word-wrap: break-word; ">Your message is Displayed here </div> -->
+            </div>
+            
+            <div class="messageBox col" id="messageId2">
+                <div class="message">
+                    Mac Algorithm<br> <label id="messageContent" style="font-weight: bold;"></label>
+                    <span>Mac Generated:</span><br><span id="mac"></span>
+                </div>
+                
+            </div>
+            <div class="col">
+                <div class="bigMessageBox " id="messageId3">
+                    <div class="messageBox" id="messageId4" style="margin-left: 10px;margin-top: 10px;">
+                        Message("<label id="messageContent2" style="font-weight: bold;"></label>")<br>
+                    </div><br>
+                    <div style="font-size:30px;margin-left: 85px;" >+</div>
+                    <br>
+                    <div class="messageBox" id="messageId5" style="margin-left: 10px;">
+                        MAC("<label id="messageContent3" style="font-weight: bold;"></label>")<br>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col messageBox" id="messageId6">
+                <div class="label">
+                    Appended Text
+                </div><br>
+                <div class="messageContent4">
+
+                </div>
+            </div>
+
+            <div class="col">
+                    <div class="messageBox" id="messageId7" style="margin-left: 10px;margin-top: 10px;">
+                        Message("<label id="messageContent7" style="font-weight: bold;"></label>")<br>
+                    </div><br><br><br><br><br>
+                    <div class="messageBox" id="messageId8" style="margin-left: 10px;">
+                        MAC("<label id="messageContent8" style="font-weight: bold;"></label>")<br>
+                    </div>
+                </div>
+            
+            <div class="messageBox col" id="messageId9" style="margin-bottom: 200px;">
+                <div class="message">
+                    Mac Algorithm<br>
+                    <span>Mac Generated:</span><br><span id="messageContent9"></span>
+                </div>
+                
+         
+
+            
+        </div>
+        <div class="messageBox col" id="messageId10">
+            IS IT Equal <br><span id="equal"></span>
+    </div>
+    </div>
+    <div class="row">
+            <div class="col messageBox" id="messageId11" style="margin-left: 250px;">
+                <div class="label" style="font-weight: bold;">Key</div><br>
+                <div id="keyValue1">
+
+                </div>
+            
+            
+       </div> 
+       <div class="col messageBox" style="margin-left: 650px;" id="messageId12">
+        <div class="label" style="font-weight: bold">Key</div><br>
+        <div id="keyValue2">
+
+        </div>
+    </div>
+        
+    </div>
+        <div class="prev">
+            <input type="button" value="prev" onclick="prev()">
+        </div>
+        <div class="next">
+            <input type="button" value="next" onclick="next()">
+        </div>
+
+        
+    </div>
+  <script>
+    var num;
+    var encrypt;
+    var macBeforeEncrypt;
+    var macAfterEncrypt;
+    // var key = document.getElementById("key").value; // The secret key as a string
+    // console.log(key);
+    // var message = document.getElementById("message").value; // The message
+    function next(){
+        num=num+1;
+        var nextId="messageId"+num;
+        var prevId="messageId"+(num-1);
+        console.log(nextId);
+        console.log(prevId);
+        if(num==4){
+            document.getElementById('messageContent2').innerHTML=document.getElementById("message").value;
+        }
+        else if(num==5){
+            mac2(document.getElementById("key").value, document.getElementById("message").value)
+      .then(macValue => {
+            macBeforeEncrypt=macValue;
+          document.getElementById('messageContent3').innerHTML = macValue;
+      })
+      .catch(error => {
+          console.error("Error:", error);
+      });
+          
+        }
+        
+        else if(num==6){
+            document.getElementById("messageId6").innerHTML=encrypt;
+        }
+        if(num==7){
+            document.getElementById('messageContent7').innerHTML=document.getElementById("message").value;
+            document.getElementById("messageId12").style.border= '5px solid red';
+        }
+        else if(num==8 ){
+            mac2(document.getElementById("key").value, document.getElementById("message").value)
+      .then(macValue => {
+          document.getElementById('messageContent8').innerHTML = macValue;
+      })
+      .catch(error => {
+          console.error("Error:", error);
+      });
+          
+        }
+        else if(num==9){
+            var newMessage=encrypt.substring(0,message.length);
+            console.log(newMessage);
+            mac2(document.getElementById("key").value, document.getElementById("message").value)
+      .then(macValue => {
+        macAfterEncrypt=macValue;
+          document.getElementById('messageContent9').innerHTML = macValue;
+      })
+      .catch(error => {
+          console.error("Error:", error);
+      });
+        }
+        else if(num==10){
+            if(macBeforeEncrypt==macAfterEncrypt){
+                document.getElementById("equal").innerHTML="Yes <br> Your message is same";
+                document.getElementById("equal").style.color="green";
+                document.getElementById("equal").style.fontWeight="bold";
+            }else{
+                document.getElementById("equal").innerHTML="NO <br> Your message is not same";
+                document.getElementById("equal").style.color="red";
+                document.getElementById("equal").style.fontWeight="bold";
+            }
+        }
+        document.getElementById(nextId).style.border= '5px solid red';
+        document.getElementById(prevId).style.border= 'none';
+        document.getElementById('messageId11').style.border= 'none';
+        if(num==10){
+            
+            document.getElementById('messageId12').style.border= 'none';
+
+        }
+        window["mac" + num]();
+    }
+
+    function prev(){
+        num=num-1;
+        var nextId="messageId"+num;
+        var prevId="messageId"+num;
+        document.getElementById(nextId).style.border= '5px solid red';
+        document.getElementById(prevId).style.border= 'none';
+
+    }
+    
+    function mac1(){
+        num=1;
+        var message = document.getElementById("message").value;
+        document.getElementById('messageContent').innerHTML=message;
+        document.getElementById('keyValue1').innerHTML=document.getElementById("key").value;
+        document.getElementById('keyValue2').innerHTML=document.getElementById("key").value;
+        document.getElementById('messageId1').style.border= '5px solid red';
+        document.getElementById('messageId11').style.border= '5px solid red';
+    }
+   
+
+    async function mac2() {
+      // Convert key and message to ArrayBuffer
+      const keyBuffer = new TextEncoder().encode(key);
+      const messageBuffer = new TextEncoder().encode(message);
+
+      // Import key
+      const importedKey = await crypto.subtle.importKey(
+        'raw', 
+        keyBuffer, 
+        { name: 'HMAC', hash: 'SHA-256' }, 
+        false, 
+        ['sign']
+      );
+
+      // Generate MAC
+      const macBuffer = await crypto.subtle.sign('HMAC', importedKey, messageBuffer);
+
+      // Convert MAC to hexadecimal string
+      const macArray = Array.from(new Uint8Array(macBuffer));
+      const macHex = macArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+      document.getElementById('mac').innerHTML=macHex;
+      console.log("mac is "+macHex);
+      encrypt = "Appended Text: "+document.getElementById("message").value+macHex;
+      
+      return macHex;
+    }
+
+   
+
+    // mac2(key, message)
+    //   .then(mac => {
+        
+    //     console.log("Generated MAC:", mac);
+    //   })
+    //   .catch(error => {
+    //     console.error("Error:", error);
+    //   });
+    // Example usage:
+    
+  </script>
+</body>
+</html>
