@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>27x27 Table</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            /* Adjust width as needed */
+            max-width: 800px;
+            /* Maximum width for the table */
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        th,
+        td {
+            padding: 5px;
+            /* Reduced padding */
+            text-align: center;
+            font-size: 12px;
+            /* Reduced font size */
+        }
+
+        .container {
+            width: 100%;
+        }
+
+        .row {
+            width: 100%;
+            display: flex;
+        }
+
+        /* Style for the second table */
+        .second-table {
+            border: none;
+            /* Remove border from the table */
+        }
+
+        .second-table th,
+        .second-table td {
+            border: none;
+            /* Remove border from table cells */
+        }
+
+        /* Add this CSS to adjust font size and keep text and key on the same line */
+        #output span,
+        #outputKey span {
+            margin: 20px;
+            font-weight: bold;
+            font-size: clamp(12px, 3vw, 50px);
+            /* Adjust the min, max, and base font sizes as needed */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <!-- Add A-Z headers for columns -->
+                            <script>
+                                for (let i = 0; i < 26; i++) {
+                                    document.write(`<th id="column${i}">` + String.fromCharCode(65 + i) + "</th>");
+                                }
+                            </script>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Loop through rows -->
+                        <script>
+                            for (let row = 0; row < 26; row++) {
+                                document.write("<tr>");
+                                // Add row label
+                                document.write(`<th id="row${row}">` + String.fromCharCode(65 + row) + "</th>");
+                                // Add cells
+                                for (let col = 0; col < 26; col++) {
+                                    // Calculate the value for each cell based on row and column
+                                    let value = String.fromCharCode(((row + col) % 26) + 65);
+                                    document.write(`<td id="row${row}Column${col}">` + value + "</td>");
+                                }
+                                document.write("</tr>");
+                            }
+                        </script>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <label>Enter the Text</label>
+                <input type="text" id="text" />
+                <label>Enter the key</label>
+                <input type="text" id="key" />
+                <button type="button" onclick="start()">Start Stimulation</button>
+                <button type="button" onclick="nextEncrypt()" id="next">Next</button>
+                <br>
+                <table class="second-table" style="width: 100%;"> <!-- Add class to the second table -->
+                    <tr>
+                        <td><span style="display: none;" id="planeText">Plane Text: </span></td>
+                        <td> <span id="output"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span style="display: none;" id="KeyText">Key: </span>
+                        </td>
+                        <td>
+                            <span id="outputKey"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span style="display: none;" id="cipherText">Cipher Text: </span>
+                        </td>
+                        <td>
+                            <span id="outputCipher"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="button" value="Start Decryption" style="display: none;" id="decrypt"
+                                onclick="decrypt()" />
+                        </td>
+                        <td>
+                            <button type="button" onclick="nextDecrypt()" id="nextDecrypt"
+                                style="display: none;">Next</button>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id="cipherTextLabel" style="display: none;">Cipher Text</td>
+                        <td id="cipherTextbox" style="margin:20px;font-weight:bold;font-size:20px"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span style="display: none;" id="KeyTextDecrypt">Key: </span>
+                        </td>
+                        <td id="outputKeyDecrypt" style="margin:20px;font-weight:bold;font-size:20px;display: block;">
+                            <!-- <span ></span> -->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Plane Text:</td>
+                        <td id="planeTextOutput" style="margin:20px;font-weight:bold;font-size:20px"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        var num = 0;
+        var clickCount = 0; // Variable to track the number of clicks
+        var lastKeyAndTextRed = false; // Variable to track if the last key and text are red
+
+        function nextEncrypt() {
+            // Increment num if all four cycles are completed
+            if (clickCount % 6 === 0 && clickCount !== 0) {
+                num++;
+            }
+
+            // Reset previously red-colored elements back to black
+            if (clickCount % 6 === 0 && num > 0) {
+                var prevTextPos = document.getElementById(`text${num - 1}`).textContent.charCodeAt(0) - 65;
+                var prevKeyPos = document.getElementById(`key${num - 1}`).textContent.charCodeAt(0) - 65;
+                document.getElementById(`column${prevTextPos}`).style.color = "black";
+                document.getElementById(`column${prevTextPos}`).style.border = "1px solid black";
+                document.getElementById(`row${prevKeyPos}`).style.color = "black";
+                document.getElementById(`row${prevKeyPos}`).style.border = "1px solid black";
+                document.getElementById(`text${num - 1}`).style.color = "black";
+                document.getElementById(`key${num - 1}`).style.color = "black";
+            }
+
+            // Use modulus to alternate between different actions based on click count
+            var text = document.getElementById("text").value;
+            var key = document.getElementById("key").value;
+            var positionText = text.charCodeAt(num) - 65;
+            var positionKey = newKey.charCodeAt(num) - 65;
+
+            if (text.charCodeAt(num) == 32) {
+                console.log("space");
+            } else {
+                let row, col;
+                switch (clickCount % 6) {
+                    case 0:
+                        // Color the text
+                        document.getElementById(`text${num}`).style.color = "red";
+                        break;
+                    case 1:
+                        // Color the column header
+                        document.getElementById(`column${positionText}`).style.color = "red";
+                        document.getElementById(`column${positionText}`).style.border = "3px solid red";
+                        break;
+                    case 2:
+                        // Color the key
+                        document.getElementById(`key${num}`).style.color = "red";
+                        break;
+                    case 3:
+                        // Color the text in the second table
+                        document.getElementById(`row${positionKey}`).style.color = "red";
+                        document.getElementById(`row${positionKey}`).style.border = "3px solid red";
+                        break;
+                    case 4:
+                        // Color the cell in the second table
+                        document.getElementById(`row${positionKey}Column${positionText}`).style.color = "green";
+                        document.getElementById(`row${positionKey}Column${positionText}`).style.border = "3px solid green";
+                        break;
+                    case 5:
+                        // Check if the last key and text are red
+                        if (num === text.length - 1) {
+                            lastKeyAndTextRed = true;
+                        }
+                        document.getElementById("cipherTextbox").innerHTML += `<span id="textCipher${num}" style="margin:20px;font-weight:bold;font-size:20px">${document.getElementById(`row${positionKey}Column${positionText}`).innerHTML}</span>`;
+                        console.log(document.getElementById("cipherTextbox").innerHTML);
+                        document.getElementById("outputCipher").innerHTML += document.getElementById(`row${positionKey}Column${positionText}`).innerHTML;
+                        document.getElementById(`outputCipher`).style.color = "green";
+                        document.getElementById(`outputCipher`).style.fontSize = "20px";
+                        break;
+                }
+            }
+
+            // Display decryption button if the last key and text are red
+            if (lastKeyAndTextRed) {
+                document.getElementById("decrypt").style.display = "block";
+                resetEncryption(); // Call the resetEncryption() function here
+            }
+
+            clickCount++;
+        }
+
+
+        var newKey;
+
+        function start() {
+            document.getElementById("planeText").style.display = "block";
+            document.getElementById("KeyText").style.display = "block";
+            document.getElementById("cipherText").style.display = "block";
+
+            var text = document.getElementById("text").value;
+            var textLen = text.length;
+            let arr = text.split('');
+            let outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = ""; // Clear previous content
+            for (let i = 0; i < textLen; i++) {
+                if (arr[i] === ' ') {
+                    // outputDiv.innerHTML += ``;
+                    continue;
+                } else {
+                    outputDiv.innerHTML += `<span id="text${i}" style="margin:20px;font-weight:bold;font-size:20px">${arr[i]}</span>`;
+                }
+            }
+
+
+            var key = document.getElementById("key").value;
+            var keyLen = key.length;
+
+            newKey = generateKey(text, key);
+            var newKeyLen = newKey.length;
+            console.log(newKey);
+            let arrKey = newKey.split('');
+            let outputDivKey = document.getElementById("outputKey");
+            let outputDivKeyDecrypt = document.getElementById("outputKeyDecrypt");
+            outputKey.innerHTML = ""; // Clear previous content
+            for (let i = 0; i < newKeyLen; i++) {
+                if (arr[i] === ' ') {
+                    // outputDivKey.innerHTML += ``;
+                    continue;
+                } else {
+                    outputDivKey.innerHTML += `<span id="key${i}" style="margin:20px;font-weight:bold;font-size:20px">${arrKey[i]}</span>`;
+                    outputDivKeyDecrypt.innerHTML += `<span id="keyDecrypt${i}" style="margin:20px;font-weight:bold;font-size:20px">${arrKey[i]}</span>`;
+                    console.log(outputDivKeyDecrypt.innerHTML);
+                }
+            }
+
+            function generateKey(text, key) {
+                let repeatedKey = '';
+                let keyIndex = 0;
+
+                for (let i = 0; i < text.length; i++) {
+                    if (text[i] !== ' ') {
+                        // Append the current character of the key to the repeatedKey
+                        repeatedKey += key[keyIndex];
+
+                        // Move to the next character in the key (wrap around if necessary)
+                        keyIndex = (keyIndex + 1) % key.length;
+                    } else {
+                        // If the current character is a space, append a space to the repeatedKey
+                        repeatedKey += ' ';
+                    }
+                }
+
+                return repeatedKey;
+            }
+
+
+        }
+
+        function moveCharacter(x, y, positionKey, positionText) {
+            document.getElementById(`row${positionKey}Column${positionText}`).style.position = "absolute";
+            document.getElementById(`row${positionKey}Column${positionText}`).style.width = "20px";
+            document.getElementById(`row${positionKey}Column${positionText}`).style.height = "20px";
+            document.getElementById(`row${positionKey}Column${positionText}`).style.transition = "all 0.3 ease";
+            var character = document.getElementById(`row${positionKey}Column${positionText}`);
+            console.log(character.innerText);
+            //character.style.position = "absolute"; // Set position to absolute
+            character.style.left = x + "px";
+            character.style.top = y + "px";
+        }
+
+        // Function to animate the character's movement from (1,1) to (100,100)
+        function animateCharacter(x, y, x1, y1, positionKey, positionText) {
+            var interval = setInterval(function () {
+                console.log("hello");
+                moveCharacter(x, y, positionKey, positionText);
+                x++;
+                y++;
+                if (x > x1 || y > y1) {
+                    clearInterval(interval);
+                }
+            }, 50); // Adjust the speed of animation here
+        }
+
+        //   // Start the animation when the page loads
+        //   window.onload = function() {
+        //   };
+        var numDecrypt = 0;
+        var clickCountDecrypt = 0; // Variable to track the numDecryptber of clicks
+        var lastKeyAndTextRed = false; // Variable to track if the last key and text are red
+
+        function nextDecrypt() {
+            // Increment numDecrypt if all four cycles are completed
+            if (clickCountDecrypt % 6 === 0 && clickCountDecrypt !== 0) {
+                numDecrypt++;
+            }
+
+            // Reset previously red-colored elements back to black
+            if (clickCountDecrypt % 6 === 0 && numDecrypt > 0) {
+                var prevTextPos = document.getElementById(`textCipher${numDecrypt - 1}`).textContent.charCodeAt(0) - 65;
+                var prevKeyPos = document.getElementById(`key${numDecrypt - 1}`).textContent.charCodeAt(0) - 65;
+                document.getElementById(`column${prevTextPos}`).style.color = "black";
+                document.getElementById(`column${prevTextPos}`).style.border = "1px solid black";
+                document.getElementById(`row${prevKeyPos}`).style.color = "black";
+                document.getElementById(`row${prevKeyPos}`).style.border = "1px solid black";
+                document.getElementById(`text${numDecrypt - 1}`).style.color = "black";
+                document.getElementById(`key${numDecrypt - 1}`).style.color = "black";
+            }
+
+            // Use modulus to alternate between different actions based on click count
+            var text = document.getElementById("outputCipher").innerHTML;
+            console.log(text);
+            var key = document.getElementById("outputKey").innerHTML;
+            var positionText = text.charCodeAt(numDecrypt) - 65;
+            console.log("position text is " + positionText);
+            var positionKey = newKey.charCodeAt(numDecrypt) - 65;
+            console.log("position key is " + positionKey);
+            positionText=positionText-positionKey;
+            var columnpos;
+            if (positionText != 0) {
+                var element = document.getElementById(`row${positionKey}Column${positionText}`);
+                if (element) {
+                    var ide = element.id;
+                    console.log(ide.substr(ide.length-1));
+
+                    // Your code using ide goes here
+                } else {
+                    // Handle the case where the element doesn't exist
+                    console.log("Element not found");
+                }
+
+                // var lastCharacter = id.slice(-1); // Using slice() method
+
+            } else {
+                var element = document.getElementById(`row${positionKey}Column${positionText}`);
+                if (element) {
+                    var ide = element.id;
+                    // Your code using ide goes here
+                } else {
+                    // Handle the case where the element doesn't exist
+                    console.log("Element not found");
+                }
+                // Using substr() method
+                // or
+                // var lastCharacter = id.slice(-1); // Using slice() method
+
+            }
+
+            if (text.charCodeAt(numDecrypt) == 32) {
+                console.log("space");
+            } else {
+                let row, col;
+                switch (clickCountDecrypt % 6) {
+                    case 2:
+                        console.log("i'm in" + 2);
+                        // Color the text
+                        document.getElementById(`textCipher${numDecrypt}`).style.color = "red";
+                        break;
+                    case 4:
+                        console.log("i'm in" + 4);
+                        // Color the column header
+                        document.getElementById(`column${positionText}`).style.color = "green";
+                        document.getElementById(`column${positionText}`).style.border = "3px solid green";
+                        break;
+                    case 0:
+                        // Color the key
+                        console.log("i'm in key" + 0);
+                        document.getElementById(`keyDecrypt${numDecrypt}`).style.color = "red";
+                        break;
+                    case 1:
+                        console.log("i'm in row" + 1);
+                        // Color the text in the second table
+                        document.getElementById(`row${positionKey}`).style.color = "red";
+                        document.getElementById(`row${positionKey}`).style.border = "3px solid red";
+                        break;
+                    case 3:
+                        console.log("i'm in row column" + 3);
+                        // Color the cell in the second table
+                        if (positionText != 0) {
+                            document.getElementById(`row${positionKey}Column${positionText }`).style.color = "red";
+                            document.getElementById(`row${positionKey}Column${positionText }`).style.border = "3px solid red";
+                        } else {
+                            document.getElementById(`row${positionKey}Column${positionText}`).style.color = "red";
+                            document.getElementById(`row${positionKey}Column${positionText}`).style.border = "3px solid red";
+                        }
+                        break;
+                    case 5:
+                        console.log("i'm in column" + 5);
+                        // Check if the last key and text are red
+                        if (numDecrypt === text.length - 1) {
+                            lastKeyAndTextRed = true;
+                        }
+                        if (positionText != 0) {
+                            document.getElementById("planeTextOutput").innerHTML += document.getElementById(`column${positionText}`).innerText;
+                        } else {
+                            document.getElementById("planeTextOutput").innerHTML += document.getElementById(`column${positionText}`).innerText;
+
+                        }
+                        document.getElementById(`planeTextOutput`).style.color = "green";
+                        document.getElementById(`planeTextOutput`).style.fontSize = "20px";
+                        break;
+                }
+            }
+
+            // Display decryption button if the last key and text are red
+            if (lastKeyAndTextRed) {
+                document.getElementById("decrypt").style.display = "block";
+            }
+
+            clickCountDecrypt++;
+        }
+
+
+
+        function decrypt() {
+            document.getElementById("next").style.display = "none";
+            document.getElementById("cipherTextLabel").style.display = "block";
+            document.getElementById("outputKeyDecrypt").style.display = "block";
+            document.getElementById("KeyTextDecrypt").style.display = "block";
+            document.getElementById("nextDecrypt").style.display = "block";
+            // document.getElementById("cipherTextbox").innerHTML = document.getElementById("outputCipher").innerHTML;
+            //document.getElementById("outputKeyDecrypt").innerHTML=newKey;
+        }
+
+        function resetEncryption() {
+            var tableCells = document.querySelectorAll('td');
+            tableCells.forEach(function (cell) {
+                cell.style.color = "black";
+                cell.style.border = "1px solid black";
+            });
+
+            var tableHeaders = document.querySelectorAll('th');
+            tableHeaders.forEach(function (header) {
+                header.style.color = "black";
+                header.style.border = "1px solid black";
+            });
+
+            var secondTableCells = document.querySelectorAll('.second-table td');
+            secondTableCells.forEach(function (cell) {
+                cell.style.color = "black";
+                cell.style.border = "none"; // Remove border for second table cells
+            });
+
+            var secondTableHeaders = document.querySelectorAll('.second-table th');
+            secondTableHeaders.forEach(function (header) {
+                header.style.color = "black";
+                header.style.border = "none"; // Remove border for second table headers
+            });
+        }
+
+        function resetDecryption() {
+            var tableCells = document.querySelectorAll('.second-table td');
+            tableCells.forEach(function (cell) {
+                cell.style.color = "black";
+                cell.style.border = "none";
+            });
+            var planeTextOutput = document.getElementById("planeTextOutput");
+            planeTextOutput.innerHTML = "";
+        }
+
+    </script>
+</body>
+
+</html>

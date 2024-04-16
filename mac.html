@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generate MAC</title>
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     .container{
         width: 100%;
@@ -19,21 +19,55 @@
         margin-bottom: 50px;
     }
 
-    .messageBox{
-        margin-left: 50px;
-        width: 150px;
-        height: 110px;
-        border: 1px solid black;
-        overflow: hidden;
-        word-wrap:  break-word;
+    .messageBox {
+    margin-left: 50px;
+    width: 150px;
+    height: 110px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    overflow: hidden;
+    word-wrap: break-word;
+    padding: 16px;
+}
 
-    }
-    .bigMessageBox{
-        margin-left: 50px;
-        width: 180px;
-        height: 320px;
-        border: 1px solid black;
-    }
+.bigMessageBox {
+    margin-left: 50px;
+    width: 200px;
+    height: 380px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    padding: 16px;
+}
+
+.messageBox::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid #ccc;
+}
+
+.bigMessageBox::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid #ccc;
+}
     
   </style>
 </head>
@@ -66,14 +100,18 @@
                 </div>
                 
             </div>
-            <!-- <div style="margin-left: 50px;width: 150px; word-wrap: break-word; ">Your message is Displayed here </div> -->
+
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-arrow-right" style="font-size: 40px;"></i>
             </div>
             
-            <div class="messageBox col" id="messageId2">
+            <div class="messageBox col" id="messageId2" style="margin-left: 0px;">
                 <div class="message">
                     Mac Algorithm<br> <label id="messageContent" style="font-weight: bold;"></label>
                     <span>Mac Generated:</span><br><span id="mac"></span>
                 </div>
+               
                 
             </div>
             <div class="col">
@@ -122,6 +160,12 @@
     </div>
     </div>
     <div class="row">
+        <div class="col " id="messageId11" style="margin-left: 320px;">
+            <i class="fa-solid fa-arrow-up" style="font-size: 2em;"></i>
+            </div>
+
+    </div>
+    <div class="row">
             <div class="col messageBox" id="messageId11" style="margin-left: 250px;">
                 <div class="label" style="font-weight: bold;">Key</div><br>
                 <div id="keyValue1">
@@ -130,6 +174,7 @@
             
             
        </div> 
+       
        <div class="col messageBox" style="margin-left: 650px;" id="messageId12">
         <div class="label" style="font-weight: bold">Key</div><br>
         <div id="keyValue2">
