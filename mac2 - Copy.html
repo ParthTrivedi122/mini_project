@@ -37,6 +37,10 @@
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
       animation: fadeIn 1s;
     }
+    .messageContent{
+      overflow: auto;
+      max-height: 150px;
+    }
 
     .row {
       display: flex;
@@ -93,6 +97,14 @@
       font-weight: bold;
     }
 
+    .messageBox, .bigMessageBox {
+  font-size: 16px;
+  line-height: 1.5;
+}
+.messageBox .mac, .bigMessageBox .mac {
+  font-family: 'Courier New', Courier, monospace;
+}
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -112,6 +124,21 @@
         flex-wrap: wrap;
       }
     }
+
+    @media (max-width: 768px) {
+  .container {
+    width: 90%;
+  }
+
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .messageBox, .bigMessageBox {
+    font-size: 14px; /* Adjust font size for smaller screens */
+    word-break: break-word; /* Allow long words to break */
+  }
+}
   </style>
 </head>
 <body>
