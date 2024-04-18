@@ -1,138 +1,430 @@
-<!-- Choose p and q as large, random prime numbers from the user and reject if both are not prime
-    Compute n = p * q 
-    Compute φ(n) = (p - 1) * (q - 1) 
-    Choose e such that 1 < e < φ(n) and e and φ (n) are coprime. Let e = 7 (ask the user for this as well)
-    Compute a value for d such that (d * e) % φ(n) = 1. 
-    Public key is (e, n) 
-    Private key is (d, n) 
-    The encryption of message is cipher = (message ^ e) % n
-    The decryption of cipher is message = (Cipher ^ d) % n  -->
+<!DOCTYPE html>
+<html lang="en">
 
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RSA Algorithm Visualizer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        textarea, input {
-            width: 100%;
-            height: 30px;
-            margin-bottom: 10px;
+
+        .row {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        button {
+
+        .messageLabel {
+            width: 200px;
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        .messageField {
+            flex: 1;
+        }
+
+        input[type="number"] {
+            width: 90%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .submit input[type="button"] {
+            background-color: #4CAF50;
+            color: white;
+            /* margin-left: 30px; */
             padding: 10px 20px;
-            font-size: 16px;
+            border: none;
+            border-radius: 7px;
             cursor: pointer;
+            width:80%;
+            margin: 20px auto;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit input[type="button"]:hover {
+            background-color: #2b772f;
+        }
+
+        .messageBox {
+            width: calc(50% - 20px);
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            overflow: hidden;
+            word-wrap: break-word;
+            padding: 16px;
+            position: relative;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .messageBox::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 10px solid #ccc;
+        }
+
+        .fa-arrow-right {
+            font-size: 40px;
+            color: #666;
+        }
+
+        .fa-arrow-right:hover {
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .messageBox {
+                width: 100%;
+            }
         }
     </style>
-    </head>
-    <body>
-    
-    <input type="number" id="p" placeholder="Enter prime number p">
-    <input type="number" id="q" placeholder="Enter prime number q">
-    <input type="number" id="e" placeholder="Enter public exponent e">
-    <textarea id="input" placeholder="Enter message"></textarea>
-    <button onclick="encrypt()">Encrypt</button>
-    <button onclick="decrypt()">Decrypt</button>
-    <textarea id="output"></textarea>
-    
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="messageLabel">
+                <label>Enter prime number p:</label>
+            </div>
+            <div class="messageField">
+                <input type="number" id="p" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="messageLabel">
+                <label>Enter prime number q:</label>
+            </div>
+            <div class="messageField">
+                <input type="number" id="q" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="messageLabel">
+                <label>Enter message to be encrypted:</label>
+            </div>
+            <div class="messageField">
+                <input type="number" id="message" />
+            </div>
+        </div>
+        <div class="submit">
+            <input type="button" class="btn" value="Submit" onclick="calculateE()" />
+        </div>
+        <div class="row">
+            <div class="messageLabel">
+                <label>Choose e:</label>
+            </div>
+            <div class="messageField">
+                <select id="e"></select>
+            </div>
+        </div>
+        <div class="submit">
+            <input type="button" class="btn" value="Start Simulation" onclick="runRSA()" />
+        </div>
+
+        <div class="row">
+            <div class="messageBox" id="step1">
+                <div class="static-data">
+                    <span class="static-data">p = </span><br>
+                    <span class="static-data">q = </span>
+                </div>
+                <div class="dynamic-data">
+                    <label id="pValue"></label><br>
+                    <label id="qValue"></label>
+                </div>
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-arrow-right" style="font-size: 40px;"></i>
+            </div>
+            <div class="messageBox" id="step2">
+                <div class="static-data">
+                    <span>n = p * q = </span>
+                </div>
+                <div class="dynamic-data">
+                    <label id="nValue"></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="messageBox" id="step3">
+                <div class="static-data">
+                    <span>φ(n) = (p - 1) * (q - 1) = </span>
+                </div>
+                <div class="dynamic-data">
+                    <label id="phiValue"></label>
+                </div>
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-arrow-right" style="font-size: 40px;"></i>
+            </div>
+            <div class="messageBox" id="step4">
+                <div class="static-data">
+                    <span>Public Key = (e, n)</span><br>
+                    <span>e = </span><br>
+                    <span>n = </span>
+                </div>
+                <div class="dynamic-data">
+                    <label id="eValue"></label><br>
+                    <label id="nValue2"></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="messageBox" id="step5">
+                <div class="static-data">
+                    <span>d = ModInverse(e, φ(n))</span><br>
+                    <span>d = </span>
+                </div>
+                <div class="dynamic-data">
+                    <label id="dValue"></label>
+                </div>
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-arrow-right" style="font-size: 40px;"></i>
+            </div>
+            <div class="messageBox" id="step6">
+                <div class="static-data">
+                    <span>Private Key = (d, n)</span><br>
+                    <span>d = </span><br>
+                    <span>n = </span>
+                </div>
+                <div class="dynamic-data">
+                    <label id="dValue2"></label><br>
+                    <label id="nValue3"></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="messageBox" id="step7">
+                <div class="static-data">
+                    <span>Message = </span>
+                </div>
+                <div class="dynamic-data">
+                    <label id="messageValue"></label>
+                </div>
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-arrow-right" style="font-size: 40px;"></i>
+            </div>
+            <div class="messageBox" id="step8">
+                <div class="static-data">
+                    <span>Cipher = Message^e mod n</span><br>
+                    <span>Cipher = </span>
+                </div>
+                <div class="dynamic-data">
+                    <label id="cipherValue"></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="messageBox" id="step9">
+                <div class="static-data">
+                    <span>Decrypted Message = Cipher^d mod n</span><br>
+                    <span>Decrypted Message = </span>
+                </div>
+                <div class="dynamic-data">
+                    <label id="decryptedValue"></label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <input type="button" class="btn" value="Previous" onclick="prevStep()" />
+            </div>
+            <div class="col">
+                <input type="button" class="btn" value="Next" onclick="nextStep()" />
+            </div>
+        </div>
+    </div>
+
     <script>
-    // function isPrime(num) {
-    //     if (num <= 1) return false;
-    //     if (num <= 3) return true;
-    //     if (num % 2 === 0 || num % 3 === 0) return false;
-    //     for (let i = 5; i * i <= num; i += 6) {
-    //         if (num % i === 0 || num % (i + 2) === 0) return false;
-    //     }
-    //     return true;
-    // }
-    // Function to check if a number is prime
-function isPrime(num) {
-    for(let i = 2, sqrt = Math.sqrt(num); i <= sqrt; i++)
-        if(num % i === 0) return false; 
-    return num > 1;
-}
-    
-    function generatePrimes() {
-        let p, q;
-        do {
-            p = parseInt(prompt("Enter prime number p"));
-        } while (!isPrime(p));
-        do {
-            q = parseInt(prompt("Enter prime number q"));
-        } while (!isPrime(q));
-        return { p, q };
-    }
-    
-    function generateKeys() {
-        const { p, q } = generatePrimes();
-        const n = p * q;
-        const phi = (p - 1) * (q - 1);
-        let e = parseInt(prompt("Enter public exponent e"));
-        while (e <= 1 || e >= phi || !isCoprime(e, phi)) {
-            e = parseInt(prompt("Enter a valid public exponent e"));
-        }
-        const d = modInverse(e, phi);
-        return { publicKey: { e, n }, privateKey: { d, n } };
-    }
-    
-    function encrypt() {
-        const { publicKey, privateKey } = generateKeys();
-        const m = parseInt(document.getElementById('input').value);
-        const c = modularExponentiation(m, publicKey.e, publicKey.n);
-        document.getElementById('output').value = `Encrypted message: ${c}`;
-    }
-    
-    function decrypt() {
-        const { publicKey, privateKey } = generateKeys();
-        const c = parseInt(document.getElementById('input').value);
-        const m = modularExponentiation(c, privateKey.d, privateKey.n);
-        document.getElementById('output').value = `Decrypted message: ${m}`;
-    }
-    
-    function modularExponentiation(base, exponent, modulus) {
-        if (modulus === 1) return 0;
-        let result = 1;
-        base = base % modulus;
-        while (exponent > 0) {
-            if (exponent % 2 === 1) {
-                result = (result * base) % modulus;
+        document.querySelectorAll('.dynamic-data').forEach(element => {
+            element.style.display = 'none';
+        });
+        let currentStep = 1;
+
+        function calculateE() {
+            const p = parseInt(document.getElementById("p").value);
+            const q = parseInt(document.getElementById("q").value);
+
+            if (!isPrime(p) || !isPrime(q)) {
+                alert("Both p and q must be prime numbers.");
+                return;
             }
-            exponent = exponent >> 1;
-            base = (base * base) % modulus;
+
+            const phi = (p - 1) * (q - 1);
+            const eSelect = document.getElementById("e");
+
+            for (let e = 2; e < phi; e++) {
+                if (gcd(e, phi) === 1) {
+                    const option = document.createElement("option");
+                    option.text = e;
+                    option.value = e;
+                    eSelect.add(option);
+                }
+                if (eSelect.options.length >= 50) break;
+            }
         }
-        return result;
-    }
-    
-    // function modInverse(a, m) {
-    //     for (let x = 1; x < m; x++) {
-    //         if (((a % m) * (x % m)) % m === 1) {
-    //             return x;
-    //         }
-    //     }
-    //     return 1;
-    // }
-    function modInverse(e, phi) {
-    e = e % phi;
-    for (let x = 1; x < phi; x++)
-        if ((e * x) % phi == 1)
+
+        function isPrime(num) {
+            if (num <= 1) return false;
+            if (num <= 3) return true;
+            if (num % 2 == 0 || num % 3 == 0) return false;
+
+            for (let i = 5; i * i <= num; i += 6) {
+                if (num % i == 0 || num % (i + 2) == 0) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function gcd(a, b) {
+            if (b === 0) {
+                return a;
+            }
+            return gcd(b, a % b);
+        }
+
+        function runRSA() {
+            const p = parseInt(document.getElementById("p").value);
+            const q = parseInt(document.getElementById("q").value);
+            const message = parseInt(document.getElementById("message").value);
+            const e = parseInt(document.getElementById("e").value);
+
+            if (!isPrime(p) || !isPrime(q)) {
+                alert("Both p and q must be prime numbers.");
+                return;
+            }
+
+            const n = p * q;
+            const phi = (p - 1) * (q - 1);
+            const d = modInverse(e, phi);
+
+            const publicKey = [e, n];
+            const privateKey = [d, n];
+
+            const cipher = modPow(message, e, n);
+            const decryptedMessage = modPow(cipher, d, n);
+
+            document.getElementById("pValue").textContent = p;
+            document.getElementById("qValue").textContent = q;
+            document.getElementById("nValue").textContent = n;
+            document.getElementById("phiValue").textContent = phi;
+            document.getElementById("eValue").textContent = e;
+            document.getElementById("nValue2").textContent = n;
+            document.getElementById("dValue").textContent = d;
+            document.getElementById("dValue2").textContent = d;
+            document.getElementById("nValue3").textContent = n;
+            document.getElementById("messageValue").textContent = message;
+            document.getElementById("cipherValue").textContent = cipher;
+            document.getElementById("decryptedValue").textContent = decryptedMessage;
+
+            highlightStep(1);
+        }
+
+        function modInverse(a, m) {
+            let m0 = m;
+            let y = 0, x = 1;
+
+            if (m == 1) return 0;
+
+            while (a > 1) {
+                let q = Math.floor(a / m);
+                let t = m;
+
+                m = a % m;
+                a = t;
+                t = y;
+
+                y = x - q * y;
+                x = t;
+            }
+
+            if (x < 0) x += m0;
+
             return x;
-}
-    
-    function gcd(a, b) {
-        if (b === 0) return a;
-        return gcd(b, a % b);
-    }
-    
-    function isCoprime(a, b) {
-        return gcd(a, b) === 1;
-    }
+        }
+
+        function modPow(base, exponent, modulus) {
+            if (modulus == 1) return 0;
+            let result = 1;
+            base = base % modulus;
+            while (exponent > 0) {
+                if (exponent % 2 == 1) {
+                    result = (result * base) % modulus;
+                }
+                exponent = Math.floor(exponent / 2);
+                base = (base * base) % modulus;
+            }
+            return result;
+        }
+
+        function highlightStep(step) {
+            const steps = document.querySelectorAll(".messageBox");
+            const dynamicData = document.querySelectorAll(".dynamic-data");
+
+            dynamicData.forEach(data => {
+                const parentStep = parseInt(data.parentElement.id.replace('step', ''));
+                if (parentStep <= step) {
+                    data.style.display = "block";
+                } else {
+                    data.style.display = "none";
+                }
+            });
+
+            steps.forEach((box, index) => {
+                if (index + 1 === step) {
+                    box.style.border = "5px solid red";
+                } else {
+                    box.style.border = "1px solid #ccc";
+                }
+            });
+
+            currentStep = step;
+        }
+
+
+        function nextStep() {
+            if (currentStep < 9) {
+                highlightStep(currentStep + 1);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                highlightStep(currentStep - 1);
+            }
+        }
     </script>
-    
-    </body>
-    </html>
-    
+</body>
+</html>
