@@ -9,6 +9,26 @@
         integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
+        body {
+            background: rgb(154, 157, 172);
+            background: linear-gradient(90deg, rgba(154, 157, 172, 1) 0%, rgba(41, 37, 46, 1) 27%, rgba(14, 16, 62, 1) 81%, rgba(187, 154, 212, 1) 100%);
+        }
+
+        .paragraph img,
+        .paragraph h1 {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0;
+        }
+
+        h1 {
+            margin-top: 0px;
+            margin-left: 5px;
+            /* Adjust as needed */
+            text-align: center;
+            color: #333;
+        }
+
         .container {
             width: 80%;
             max-width: 800px;
@@ -44,21 +64,25 @@
         }
 
         .submit input[type="button"] {
-            background-color: #4CAF50;
+            background-color: #0d8af0;
             color: white;
             /* margin-left: 30px; */
             padding: 10px 20px;
             border: none;
             border-radius: 7px;
             cursor: pointer;
-            width:80%;
+            width: 80%;
             margin: 20px auto;
             display: block;
             transition: background-color 0.3s ease;
         }
 
         .submit input[type="button"]:hover {
-            background-color: #2b772f;
+            background-color: #1d5a62;
+        }
+
+        label {
+            width: 100%;
         }
 
         .messageBox {
@@ -107,7 +131,10 @@
 
 <body>
     <div class="container">
+        <h1>RSA Algorithm</h1>
         <div class="row">
+
+
             <div class="messageLabel">
                 <label>Enter prime number p:</label>
             </div>
@@ -135,22 +162,29 @@
             <input type="button" class="btn" value="Submit" onclick="calculateE()" />
         </div>
         <div class="row">
-            <div class="messageLabel">
-                <label>Choose e:</label>
+            <div><!--class = "messageLabel"-->
+                <label>Choose e such that 1 < e < φ(n) and e and φ (n) are coprime: </label>
             </div>
             <div class="messageField">
                 <select id="e"></select>
             </div>
+
         </div>
         <div class="submit">
             <input type="button" class="btn" value="Start Simulation" onclick="runRSA()" />
         </div>
 
+
+        <p class="paragraph"> <img src="lock.png" height="40px" alt="">
+        <h1>Encryption Phase:</h1>
+        </p>
         <div class="row">
+
             <div class="messageBox" id="step1">
+
                 <div class="static-data">
-                    <span class="static-data">p = </span><br>
-                    <span class="static-data">q = </span>
+                    <span>p = </span><br>
+                    <span>q = </span>
                 </div>
                 <div class="dynamic-data">
                     <label id="pValue"></label><br>
@@ -179,6 +213,7 @@
                     <label id="phiValue"></label>
                 </div>
             </div>
+
             <div class="col">
                 <i class="fa-solid fa-arrow-right" style="font-size: 40px;"></i>
             </div>
@@ -194,7 +229,9 @@
                 </div>
             </div>
         </div>
-
+        <p class="paragraph"> <img src="unlock.png" height="40px" alt="">
+        <h1>Decryption Phase:</h1>
+        </p>
         <div class="row">
             <div class="messageBox" id="step5">
                 <div class="static-data">
@@ -283,8 +320,7 @@
             const phi = (p - 1) * (q - 1);
             const eSelect = document.getElementById("e");
 
-            for (let e = 2; e < phi; e++) 
-            {
+            for (let e = 2; e < phi; e++) {
                 if (gcd(e, phi) === 1) {
                     const option = document.createElement("option");
                     option.text = e;
@@ -428,4 +464,5 @@
         }
     </script>
 </body>
+
 </html>
