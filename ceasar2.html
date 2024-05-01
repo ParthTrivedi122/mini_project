@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caesar Cipher Visualization</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 600px;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .container:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="text"], input[type="number"], button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus, button:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #outputText {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            color: #4CAF50;
+        }
+
+        #steps {
+            margin-top: 20px;
+            text-align: left;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .alphabet-matrix {
+            display: grid;
+            grid-template-columns: repeat(26, 1fr);
+            grid-gap: 2px;
+            margin-top: 20px;
+            background-color: #333;
+            padding: 5px;
+            border-radius: 5px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .alphabet-matrix div {
+            background-color: #fff;
+            padding: 5px;
+            text-align: center;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .alphabet-matrix div:hover {
+            background-color: #f5f5f5;
+        }
+
+        .starting-char {
+            background-color: #ffc107 !important;
+            color: #333;
+        }
+
+        .highlighted {
+            background-color: #4CAF50 !important;
+            color: white;
+        }
+
+        .output-text {
+            background-color: #4CAF50 !important;
+            color: white;
+        }
+        
+        .speed-controller {
+            width: 100%;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Caesar Cipher Encryption and Decryption</h1>
+        <label for="inputText">Enter text:</label>
+        <input type="text" id="inputText" placeholder="Enter text">
+        <label for="shift">Enter shift value:</label>
+        <input type="number" id="shift" min="1" value="1">
+        <button onclick="encryptAndClear()">Encrypt</button>
+        <button onclick="decryptAndClear()">Decrypt</button>
+        <button onclick="clearOutput()">Clear Output</button>
+        <div class="speed-controller">
+            <label for="speedController">Speed Controller:</label>
+            <input type="range" id="speedController" min="1" max="2000" value="1000" onchange="updateSpeed()">
+        </div>
+        <div id="outputText"></div>
+        <div id="steps"></div>
+        <div class="alphabet-matrix" id="alphabet-matrix"></div>
+    </div>
+
+    <script>
+        let speed = 1000; // Default speed
+
+        function updateSpeed() {
+            speed = parseInt(document.getElementById('speedController').value);
+        }
+
+        function animateSteps(steps, index) {
+            if (index < steps.length) {
+                document.getElementById('steps').innerHTML += steps[index].text;
+                highlightShift(steps[index].index, steps[index].shift, steps[index].isEncryption);
+                setTimeout(function() {
+                    animateSteps(steps, index + 1);
+                }, speed); // Use the speed variable for delay
+            } else {
+                removeMatrixFromOutput();
+            }
+        }
+
+        function generateAlphabetMatrix() {
+            const alphabetMatrix = document.getElementById('alphabet-matrix');
+            alphabetMatrix.innerHTML = '';
+
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            for (let i = 0; i < alphabet.length; i++) {
+                const char = alphabet[i];
+                const div = document.createElement('div');
+                div.textContent = char;
+                alphabetMatrix.appendChild(div);
+            }
+        }
+
+        function highlightShift(charIndex, shift, isEncryption) {
+            const alphabetMatrix = document.getElementById('alphabet-matrix');
+            const divs = alphabetMatrix.getElementsByTagName('div');
+            const shiftedIndex = (charIndex + (isEncryption ? shift : -shift) + 26) % 26;
+            divs[charIndex].classList.add('starting-char');
+            divs[shiftedIndex].classList.add('highlighted');
+            setTimeout(() => {
+                divs[charIndex].classList.remove('starting-char');
+                divs[shiftedIndex].classList.remove('highlighted');
+            }, speed); // Use the speed variable for delay
+        }
+
+        function encryptAndClear() {
+            // Clear previous output
+            clearOutput();
+            encrypt();
+        }
+
+        function encrypt() {
+            const plaintext = document.getElementById('inputText').value;
+            const shift = parseInt(document.getElementById('shift').value);
+            let encryptedText = '';
+            let steps = [];
+
+            generateAlphabetMatrix();
+
+            const words = plaintext.split(' '); // Split text into words
+
+            for (let j = 0; j < words.length; j++) {
+                const word = words[j];
+                for (let i = 0; i < word.length; i++) {
+                    let char = word[i];
+                    let charCode = word.charCodeAt(i);
+
+                    // Encrypt uppercase letters
+                    if (charCode >= 65 && charCode <= 90) {
+                        let encryptedCharCode = ((charCode - 65 + shift) % 26) + 65;
+                        encryptedText += String.fromCharCode(encryptedCharCode);
+                        steps.push({ text: `'${char}' shifted by ${shift} positions: ${String.fromCharCode(charCode)} => ${String.fromCharCode(encryptedCharCode)}`, index: charCode - 65, shift: shift, isEncryption: true });
+                    }
+                    // Encrypt lowercase letters
+                    else if (charCode >= 97 && charCode <= 122) {
+                        let encryptedCharCode = ((charCode - 97 + shift) % 26) + 97;
+                        encryptedText += String.fromCharCode(encryptedCharCode);
+                        steps.push({ text: `'${char}' shifted by ${shift} positions: ${String.fromCharCode(charCode)} => ${String.fromCharCode(encryptedCharCode)}`, index: charCode - 97, shift: shift, isEncryption: true });
+                    }
+                    // Keep other characters unchanged
+                    else {
+                        encryptedText += char;
+                        steps.push({ text: `'${char}' remains unchanged`, index: null, shift: null, isEncryption: true });
+                    }
+                }
+                encryptedText += ' '; // Add space between words
+            }
+
+            document.getElementById('outputText').innerText = `Encrypted text: ${encryptedText}`;
+            animateSteps(steps, 0);
+        }
+
+        function decryptAndClear() {
+            // Clear previous output
+            clearOutput();
+            decrypt();
+        }
+
+        function decrypt() {
+            const ciphertext = document.getElementById('inputText').value;
+            const shift = parseInt(document.getElementById('shift').value);
+            let decryptedText = '';
+            let steps = [];
+
+            generateAlphabetMatrix();
+
+            const words = ciphertext.split(' '); // Split text into words
+
+            for (let j = 0; j < words.length; j++) {
+                const word = words[j];
+                for (let i = 0; i < word.length; i++) {
+                    let char = word[i];
+                    let charCode = word.charCodeAt(i);
+
+                    // Decrypt uppercase letters
+                    if (charCode >= 65 && charCode <= 90) {
+                        let decryptedCharCode = ((charCode - 65 - shift + 26) % 26) + 65;
+                        decryptedText += String.fromCharCode(decryptedCharCode);
+                        steps.push({ text: `'${char}' shifted back by ${shift} positions: ${String.fromCharCode(charCode)} => ${String.fromCharCode(decryptedCharCode)}`, index: charCode - 65, shift: shift, isEncryption: false });
+                    }
+                    // Decrypt lowercase letters
+                    else if (charCode >= 97 && charCode <= 122) {
+                        let decryptedCharCode = ((charCode - 97 - shift + 26) % 26) + 97;
+                        decryptedText += String.fromCharCode(decryptedCharCode);
+                        steps.push({ text: `'${char}' shifted back by ${shift} positions: ${String.fromCharCode(charCode)} => ${String.fromCharCode(decryptedCharCode)}`, index: charCode - 97, shift: shift, isEncryption: false });
+                    }
+                    // Keep other characters unchanged
+                    else {
+                        decryptedText += char;
+                        steps.push({ text: `'${char}' remains unchanged`, index: null, shift: null, isEncryption: false });
+                    }
+                }
+                decryptedText += ' '; // Add space between words
+            }
+
+            document.getElementById('outputText').innerText = `Decrypted text: ${decryptedText}`;
+            animateSteps(steps, 0);
+        }
+
+        function clearOutput() {
+            document.getElementById('outputText').innerText = '';
+            document.getElementById('steps').innerHTML = '';
+            clearMatrixHighlights();
+            document.getElementById('alphabet-matrix').classList.remove('output-text');
+        }
+
+        function clearMatrixHighlights() {
+            const alphabetMatrix = document.getElementById('alphabet-matrix');
+            const divs = alphabetMatrix.getElementsByTagName('div');
+            for (let i = 0; i < divs.length; i++) {
+                divs[i].classList.remove('starting-char');
+                divs[i].classList.remove('highlighted');
+            }
+        }
+
+        function removeMatrixFromOutput() {
+            document.getElementById('alphabet-matrix').classList.add('output-text');
+        }
+    </script>
+</body>
+</html>
