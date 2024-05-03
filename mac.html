@@ -235,6 +235,8 @@
     // var key = document.getElementById("key").value; // The secret key as a string
     // console.log(key);
     // var message = document.getElementById("message").value; // The message
+
+    
     function next(){
         num=num+1;
         var nextId="messageId"+num;
@@ -326,6 +328,47 @@
         window["mac" + num]();
     }
 
+    function checkKeyStrength(key) {
+        const keyLength = key.length;
+        console.log("Key length:", keyLength);
+
+        const hasUpperCase = /[A-Z]/.test(key);
+        console.log("Has uppercase:", hasUpperCase);
+
+        const hasLowerCase = /[a-z]/.test(key);
+        console.log("Has lowercase:", hasLowerCase);
+
+        const hasNumbers = /\d/.test(key) || Array.from(key).some(char => !isNaN(Number(char)));
+        console.log("Has numbers:", hasNumbers);
+
+        const hasSpecialChars = /[^A-Za-z0-9]/.test(key);
+        console.log("Has special chars:", hasSpecialChars);
+
+        let strength = 0;
+
+        if (keyLength >= 8) {
+            strength += 1;
+        } else {
+            return 0; // If the key length is less than 8, return 0 (weak) immediately
+        }
+
+        if (hasUpperCase) {
+            strength += 1;
+        }
+        if (hasLowerCase) {
+            strength += 1;
+        }
+        if (hasNumbers) {
+            strength += 1;
+        }
+        if (hasSpecialChars) {
+            strength += 1;
+        }
+
+        console.log("Strength score:", strength);
+        return strength;
+    }
+    
   
     
     function mac1(){
@@ -336,6 +379,18 @@
         document.getElementById('keyValue2').innerHTML=document.getElementById("key").value;
         document.getElementById('messageId1').style.border= '5px solid red';
         document.getElementById('messageId11').style.border= '5px solid red';
+
+        const keyStrength = checkKeyStrength(key);
+        console.log("Key value:", key);
+        
+
+        if (keyStrength < 3) {
+            alert("The key you entered is weak and can be easily cracked. Please choose a stronger key with a mix of uppercase, lowercase, numbers, and special characters, and a minimum length of 8 characters.");
+        } else if (keyStrength === 3) {
+            alert("The key you entered is moderate in strength. Consider using a stronger key for better security.");
+        } else {
+            alert("The key you entered is strong and secure.");
+        }
     }
    
 
@@ -370,17 +425,6 @@
 
   return {"mac":macHex,"text":messageWithMac}; // Return the message with MAC appended
 }
-
-
-    // mac2(key, message)
-    //   .then(mac => {
-        
-    //     console.log("Generated MAC:", mac);
-    //   })
-    //   .catch(error => {
-    //     console.error("Error:", error);
-    //   });
-    // Example usage:
     
   </script>
 </body>
